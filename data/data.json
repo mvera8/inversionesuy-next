@@ -1,0 +1,371 @@
+{
+	"inflacion": {
+		"mensual": "-0,09%",
+		"mes": "Enero 2025",
+		"interanual": "3,65%"
+	},
+	"bancos": [
+		{
+			"id": "brou",
+			"label": "Banco de la República Oriental del Uruguay",
+			"short": "BROU",
+			"ahorro_sueldo": {
+				"renovacion1": 7.35,
+				"renovacion2": 8.45,
+				"renovacion3": 9.19
+			},
+			"plazo_fijo": [
+				{
+					"pesos": {
+						"minimo": 5000,
+						"disclaimer": "Tazas E-BROU",
+						"vencimiento": [
+							{
+								"desde": 30,
+								"hasta": 59,
+								"tasa": 5.75
+							},
+							{
+								"desde": 60,
+								"hasta": 90,
+								"tasa": 6.25
+							},
+							{
+								"desde": 91,
+								"hasta": 180,
+								"tasa": 7.00
+							},
+							{
+								"desde": 181,
+								"hasta": 366,
+								"tasa": 7.10
+							},
+							{
+								"desde": 367,
+								"hasta": 546,
+								"tasa": 7.25
+							},
+							{
+								"desde": 547,
+								"hasta": 731,
+								"tasa": 7.35
+							},
+							{
+								"desde": 732,
+								"hasta": 1096,
+								"tasa": 7.35
+							}
+						],
+						"mensual": [
+							{
+								"desde": 91,
+								"hasta": 180,
+								"tasa": 6.30
+							},
+							{
+								"desde": 181,
+								"hasta": 366,
+								"tasa": 6.39
+							},
+							{
+								"desde": 367,
+								"hasta": 546,
+								"tasa": 6.53
+							},
+							{
+								"desde": 547,
+								"hasta": 731,
+								"tasa": 6.62
+							}
+						]
+					},
+					"dolares": {
+						"minimo": 500,
+						"disclaimer": "Tazas E-BROU",
+						"vencimiento": [
+							{
+								"desde": 30,
+								"hasta": 59,
+								"tasa": 1.5
+							},
+							{
+								"desde": 60,
+								"hasta": 90,
+								"tasa": 2
+							},
+							{
+								"desde": 91,
+								"hasta": 180,
+								"tasa": 2.9
+							},
+							{
+								"desde": 181,
+								"hasta": 366,
+								"tasa": 3
+							},
+							{
+								"desde": 367,
+								"hasta": 546,
+								"tasa": 3.10
+							}
+						],
+						"mensual": [
+							{
+								"desde": 91,
+								"hasta": 180,
+								"tasa": 2.61
+							},
+							{
+								"desde": 181,
+								"hasta": 366,
+								"tasa": 2.7
+							},
+							{
+								"desde": 367,
+								"hasta": 546,
+								"tasa": 2.79
+							}
+						]
+					}
+				}
+			]
+		},
+		{
+			"id": "itau",
+			"label": "Banco Itaú",
+			"short": "Itaú",
+			"plazo_fijo": [
+				{
+					"pesos": {
+						"minimo": 10000,
+						"disclaimer": "",
+						"vencimiento": [
+							{
+								"desde": 30,
+								"hasta": 59,
+								"tasa": 2.5
+							},
+							{
+								"desde": 60,
+								"hasta": 90,
+								"tasa": 3
+							},
+							{
+								"desde": 91,
+								"hasta": 119,
+								"tasa": 4
+							},
+							{
+								"desde": 120,
+								"hasta": 180,
+								"tasa": 6.75
+							},
+							{
+								"desde": 181,
+								"hasta": 269,
+								"tasa": 6.75
+							},
+							{
+								"desde": 270,
+								"hasta": 366,
+								"tasa": 6.75
+							},
+							{
+								"desde": 367,
+								"hasta": 546,
+								"tasa": 7
+							},
+							{
+								"desde": 547,
+								"hasta": 732,
+								"tasa": 7
+							}
+						]
+					},
+					"dolares": {
+						"minimo": 1000,
+						"disclaimer": "",
+						"vencimiento": [
+							{
+								"desde": 91,
+								"hasta": 180,
+								"tasa": 2.25
+							},
+							{
+								"desde": 181,
+								"hasta": 269,
+								"tasa": 2.75
+							},
+							{
+								"desde": 270,
+								"hasta": 366,
+								"tasa": 2.5
+							}
+						]
+					}
+				}
+			],
+			"letra": ""
+		},
+		{
+			"id": "bbva",
+			"label": "Banco BBVA",
+			"short": "BBVA",
+			"plazo_fijo": [
+				{
+					"pesos": {
+						"minimo": 10000,
+						"disclaimer": "Tasa por importes hasta $150.000",
+						"vencimiento": [
+							{
+								"desde": 0,
+								"hasta": 30,
+								"tasa": 2
+							},
+							{
+								"desde": 31,
+								"hasta": 90,
+								"tasa": 3
+							},
+							{
+								"desde": 91,
+								"hasta": 181,
+								"tasa": 4.75
+							},
+							{
+								"desde": 182,
+								"hasta": 367,
+								"tasa": 5.5
+							}
+						]
+					},
+					"dolares": {
+						"minimo": 1000,
+						"disclaimer": "Tasa importes hasta USD 100.000",
+						"vencimiento": [
+							{
+								"desde": 0,
+								"hasta": 30,
+								"tasa": 1.5
+							},
+							{
+								"desde": 31,
+								"hasta": 90,
+								"tasa": 2
+							},
+							{
+								"desde": 91,
+								"hasta": 181,
+								"tasa": 2
+							},
+							{
+								"desde": 182,
+								"hasta": 367,
+								"tasa": 2
+							}
+						]
+					}
+				}
+			]
+		},
+		{
+			"id": "scotiabank",
+			"label": "Scotiabank",
+			"short": "Scotiabank",
+			"plazo_fijo": [
+				{
+					"pesos": {
+						"minimo": 25000,
+						"disclaimer": "Tasa por importes hasta $250.000",
+						"vencimiento": [
+							{
+								"desde": 0,
+								"hasta": 30,
+								"tasa": 0.4
+							},
+							{
+								"desde": 31,
+								"hasta": 60,
+								"tasa": 1.9
+							},
+							{
+								"desde": 61,
+								"hasta": 90,
+								"tasa": 2.15
+							},
+							{
+								"desde": 91,
+								"hasta": 180,
+								"tasa": 2.8
+							},
+							{
+								"desde": 181,
+								"hasta": 366,
+								"tasa": 3.1
+							},
+							{
+								"desde": 367,
+								"hasta": 999,
+								"tasa": 3.35
+							}
+						]
+					},
+					"dolares": {
+						"minimo": 2000,
+						"disclaimer": "Tasa importes hasta USD 50.000",
+						"vencimiento": [
+							{
+								"desde": 0,
+								"hasta": 30,
+								"tasa": 0.1
+							},
+							{
+								"desde": 31,
+								"hasta": 60,
+								"tasa": 0.9
+							},
+							{
+								"desde": 61,
+								"hasta": 90,
+								"tasa": 1.15
+							},
+							{
+								"desde": 91,
+								"hasta": 180,
+								"tasa": 1.5
+							},
+							{
+								"desde": 181,
+								"hasta": 366,
+								"tasa": 1.9
+							},
+							{
+								"desde": 367,
+								"hasta": 999,
+								"tasa": 1.8
+							}
+						]
+					}
+				}
+			]
+		}
+	],
+	"exchanges": [
+		{
+			"id": "binance",
+			"label": "Binance"
+		},
+		{
+			"id": "prex",
+			"label": "Prex"
+		},
+		{
+			"id": "lemoncash",
+			"label": "Lemon Cash"
+		},
+		{
+			"id": "otro",
+			"label": "Otro"
+		}
+	]
+}
