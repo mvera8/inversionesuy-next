@@ -95,7 +95,7 @@ export function InvestmentForm({ investment, onSuccess }: InvestmentFormProps) {
         validate: {
             name: (value) => (value.length < 2 ? 'Name must be at least 2 characters long' : null),
             type: (value) => (value.length < 2 ? 'Type must be at least 2 characters long' : null),
-            rate: (value, values) => (values.type !== 'crypto' && value <= 0 ? 'Rate must be more than 0' : null),
+            rate: (value, values) => (values.type !== 'crypto' && values.type !== 'other' && value <= 0 ? 'Rate must be more than 0' : null),
             amount_nominal: (value) => (value <= 0 ? 'Amount must be more than 0' : null),
             institution: (value) => (value.length < 0 ? 'Must select an option' : null),
         },
@@ -175,7 +175,7 @@ export function InvestmentForm({ investment, onSuccess }: InvestmentFormProps) {
                     {...form.getInputProps('institution')}
                 />
 
-                {form.values.type !== 'crypto' && (
+                {form.values.type !== 'crypto' && form.values.type !== 'other' && (
                     <NumberInput
                         label="Tasa de Interés"
                         {...form.getInputProps('rate')}
@@ -226,7 +226,7 @@ export function InvestmentForm({ investment, onSuccess }: InvestmentFormProps) {
                         {...form.getInputProps('purchase_date')}
                     />
 
-                    {form.values.type !== 'crypto' && (
+                    {form.values.type !== 'crypto' && form.values.type !== 'other' && (
                         <ExpirationDateField type={form.values.type} form={form} />
                     )}
                 </SimpleGrid>

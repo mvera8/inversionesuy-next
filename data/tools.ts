@@ -64,7 +64,7 @@ const tools: Tool[] = [
         "value": "crypto",
         "label": "Crypto",
         "riesgo": "Medio",
-        "color": "orange"
+        "color": "cyan"
     },
     {
         "value": "acciones",
@@ -79,10 +79,10 @@ const tools: Tool[] = [
         "color": "teal"
     },
     {
-        "value": "otro",
+        "value": "other",
         "label": "Otro",
         "riesgo": "-",
-        "color": "gray"
+        "color": "orange"
     }
 ];
 

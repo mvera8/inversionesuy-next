@@ -12,7 +12,7 @@ const dateSchema = z.preprocess((arg) => {
 }, z.string().optional());
 
 const investmentSchema = z.object({
-    type: z.enum(['letra', 'plazo_fijo', 'crypto', 'bono', 'ahorro_sueldo']),
+    type: z.enum(['letra', 'plazo_fijo', 'crypto', 'bono', 'ahorro_sueldo', 'other']),
     subtype: z.string().optional(),
     currency: z.enum(['UYU', 'USD', 'UI']),
     amount_nominal: z.number().positive(),

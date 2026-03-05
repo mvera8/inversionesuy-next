@@ -3,7 +3,6 @@ import { resolveInstitutionName } from "@/utils/banks";
 import dayjs from "dayjs";
 import {
     Badge,
-    Card,
     Group,
     NumberFormatter,
     Progress,
@@ -14,6 +13,8 @@ import {
 } from "@mantine/core";
 import { calculateAhorroSueldo } from "@/utils/ahorroSueldo-calculator";
 import { CardNumber } from "@/components/CardNumber";
+import { StatCard } from "@/components/StatCard";
+import { DashboardCard } from "@/components/DashboardCard";
 
 function InvestmentCard({ investment }: { investment: Investment }) {
     const institutionName = resolveInstitutionName(String(investment.institution));
@@ -31,23 +32,16 @@ function InvestmentCard({ investment }: { investment: Investment }) {
     });
 
     return (
-        <Card>
+        <DashboardCard
+            title={investment.name}
+            description={`${purchaseDate.format("DD/MM/YYYY")} → ${expirationDate.format("DD/MM/YYYY")} · Tasa ${rate.toFixed(2)}% EA`}
+        >
             <Stack gap="md">
                 {/* header */}
                 <Group justify="space-between" align="flex-start">
-                    <Stack gap={4}>
-                        <Group gap="xs">
-                            <Text fw={700} size="md">
-                                {investment.name || "Ahorro Sueldo"}
-                            </Text>
-                            <Badge variant="light" color="teal" size="sm">
-                                {institutionName}
-                            </Badge>
-                        </Group>
-                        <Text size="xs" c="dimmed">
-                            {purchaseDate.format("DD/MM/YYYY")} → {expirationDate.format("DD/MM/YYYY")} · Tasa {rate.toFixed(2)}% EA
-                        </Text>
-                    </Stack>
+                    <Badge variant="light" color="teal" size="sm">
+                        {institutionName}
+                    </Badge>
 
                     <Stack gap={2} align="flex-end">
                         <Text size="xs" c="dimmed">cuota mensual</Text>
@@ -64,30 +58,30 @@ function InvestmentCard({ investment }: { investment: Investment }) {
                         <Text size="xs" c="dimmed" fw={600}>{calc.progreso}%</Text>
                     </Group>
                     <Tooltip label={`${calc.progreso}% completado`} position="top">
-                        <Progress value={calc.progreso} color="teal" size="sm" radius="xl" />
+                        <Progress value={calc.progreso} color="teal" size="md" radius="xl" />
                     </Tooltip>
                 </Stack>
 
                 {/* stats */}
                 <SimpleGrid cols={{ base: 1, xs: 3 }}>
-                    <CardNumber
-                        title="Ahorrado"
+                    <StatCard
+                        label="Ahorrado"
                         value={calc.ahorradoHastaHoy}
                         currency="UYU"
                     />
-                    <CardNumber
-                        title="Ganancia"
+                    <StatCard
+                        label="Ganancia"
                         value={calc.gananciaHastaHoy}
                         currency="UYU"
                     />
-                    <CardNumber
-                        title="Total"
+                    <StatCard
+                        label="Total"
                         value={calc.totalHastaHoy}
                         currency="UYU"
                     />
                 </SimpleGrid>
             </Stack>
-        </Card>
+        </DashboardCard>
     );
 }
 
@@ -113,51 +107,46 @@ export const AhorroSueldoUI = ({ investments }: { investments: Investment[] }) =
     );
 
     return (
-        <Stack gap="lg">
-            <Text size="sm" c="dimmed">
-                {ahorroSueldo.length} inversión{ahorroSueldo.length !== 1 ? "es" : ""} activa{ahorroSueldo.length !== 1 ? "s" : ""}
-            </Text>
+        <>
 
             {/* resumen global (solo si hay más de 1) */}
             {ahorroSueldo.length > 1 && (
-                <Card withBorder radius="md" p="md">
-                    <Stack gap="xs">
-                        <Text size="xs" tt="uppercase" c="dimmed" fw={600} lts={1}>
-                            Resumen total
-                        </Text>
-                        <SimpleGrid cols={{ base: 1, xs: 3 }} spacing="xs">
-                            <CardNumber
-                                title="Ahorrado"
-                                value={totales.ahorrado}
-                                currency="UYU"
-                            />
-                            <CardNumber
-                                title="Ganancia"
-                                value={totales.ganancia}
-                                currency="UYU" />
-                            <CardNumber
-                                title="Total"
-                                value={totales.total}
-                                currency="UYU"
-                            />
-                        </SimpleGrid>
-                    </Stack>
-                </Card>
+                <SimpleGrid cols={{ base: 1, xs: 3 }} spacing="xs">
+                    <CardNumber
+                        title="Ahorrado"
+                        value={totales.ahorrado}
+                        currency="UYU"
+                    />
+                    <CardNumber
+                        title="Ganancia"
+                        value={totales.ganancia}
+                        currency="UYU" />
+                    <CardNumber
+                        title="Total"
+                        value={totales.total}
+                        currency="UYU"
+                    />
+                </SimpleGrid>
             )}
+            <Stack gap="lg">
+                <Text size="sm" c="dimmed">
+                    {ahorroSueldo.length} inversión{ahorroSueldo.length !== 1 ? "es" : ""} activa{ahorroSueldo.length !== 1 ? "s" : ""}
+                </Text>
 
-            {ahorroSueldo.length === 0 ? (
-                <Card withBorder radius="md" p="xl">
-                    <Text ta="center" c="dimmed" size="sm">
-                        No hay inversiones de Ahorro en Sueldo registradas.
-                    </Text>
-                </Card>
-            ) : (
-                <Stack gap="md">
-                    {ahorroSueldo.map((inv) => (
-                        <InvestmentCard key={String(inv.id)} investment={inv} />
-                    ))}
-                </Stack>
-            )}
-        </Stack>
+                {ahorroSueldo.length === 0 ? (
+                    <DashboardCard>
+                        <Text ta="center" c="dimmed" size="sm">
+                            No hay inversiones de Ahorro en Sueldo registradas.
+                        </Text>
+                    </DashboardCard>
+                ) : (
+                    <Stack gap="md">
+                        {ahorroSueldo.map((inv) => (
+                            <InvestmentCard key={String(inv.id)} investment={inv} />
+                        ))}
+                    </Stack>
+                )}
+            </Stack>
+        </>
     );
 };

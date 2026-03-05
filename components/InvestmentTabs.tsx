@@ -20,7 +20,7 @@ export function InvestmentTabs({
             defaultValue="investments"
             variant="pills"
         >
-            <Tabs.List>
+            <Tabs.List mb="md">
                 <Tabs.Tab
                     value="investments"
                     leftSection={<IconTableFilled size={18} />}

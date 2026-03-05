@@ -1,13 +1,16 @@
-import { Box, Text } from "@mantine/core";
+import { Box, Card, NumberFormatter, Text } from "@mantine/core";
+import { TextDimmed } from "./TextDimmed";
 
-export function StatCard({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
+export function StatCard({ label, value, accent, currency }: { label: string; value: string | number; accent?: boolean; currency?: string }) {
     return (
-        <Box
-            p="sm"
+        <Card
+            p="xs"
+            bg="gray.0"
+            radius="md"
         >
-            <Text size="xs" tt="uppercase" fw={600} c="dimmed" lts={1}>
+            <TextDimmed>
                 {label}
-            </Text>
+            </TextDimmed>
             <Text
                 size="lg"
                 fw={700}
@@ -16,8 +19,12 @@ export function StatCard({ label, value, accent }: { label: string; value: strin
                 lh={1.3}
                 mt={4}
             >
-                {value}
+                {currency && typeof value === "number" ? (
+                    <NumberFormatter prefix={`${currency} `} value={value} thousandSeparator />
+                ) : (
+                    value
+                )}
             </Text>
-        </Box>
+        </Card>
     );
 }
