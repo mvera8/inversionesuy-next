@@ -1,3 +1,5 @@
+'use client';
+
 import { Investment } from "@/types/investment";
 import { resolveInstitutionName } from "@/utils/banks";
 import dayjs from "dayjs";
@@ -15,8 +17,14 @@ import { calculateAhorroSueldo } from "@/utils/ahorroSueldo-calculator";
 import { CardNumber } from "@/components/CardNumber";
 import { StatCard } from "@/components/StatCard";
 import { DashboardCard } from "@/components/DashboardCard";
+import { useCurrency } from "@/context/currency";
+
+const AHORRO_CURRENCY = 'UYU' as const;
 
 function InvestmentCard({ investment }: { investment: Investment }) {
+    const { usdRate } = useCurrency();
+    const currency = AHORRO_CURRENCY;
+
     const institutionName = resolveInstitutionName(String(investment.institution));
     const montoMensual = Number(investment.amount_nominal);
     const rate = Number(investment.rate);
@@ -37,19 +45,22 @@ function InvestmentCard({ investment }: { investment: Investment }) {
             description={`${purchaseDate.format("DD/MM/YYYY")} → ${expirationDate.format("DD/MM/YYYY")} · Tasa ${rate.toFixed(2)}% EA`}
         >
             <Stack gap="md">
-                {/* header */}
                 <Group justify="space-between" align="flex-start">
                     <Badge variant="light" color="teal" size="sm">
                         {institutionName}
                     </Badge>
-
                     <Stack gap={2} align="flex-end">
                         <Text size="xs" c="dimmed">cuota mensual</Text>
-                        <NumberFormatter prefix="UYU " value={montoMensual} />
+                        <NumberFormatter
+                            prefix="$ "
+                            value={montoMensual}
+                            thousandSeparator="."
+                            decimalSeparator=","
+                            decimalScale={0}
+                        />
                     </Stack>
                 </Group>
 
-                {/* progress */}
                 <Stack gap={6}>
                     <Group justify="space-between">
                         <Text size="xs" c="dimmed">
@@ -62,22 +73,21 @@ function InvestmentCard({ investment }: { investment: Investment }) {
                     </Tooltip>
                 </Stack>
 
-                {/* stats */}
                 <SimpleGrid cols={{ base: 1, xs: 3 }}>
                     <StatCard
                         label="Ahorrado"
                         value={calc.ahorradoHastaHoy}
-                        currency="UYU"
+                        currency={AHORRO_CURRENCY}
                     />
                     <StatCard
                         label="Ganancia"
                         value={calc.gananciaHastaHoy}
-                        currency="UYU"
+                        currency={AHORRO_CURRENCY}
                     />
                     <StatCard
                         label="Total"
                         value={calc.totalHastaHoy}
-                        currency="UYU"
+                        currency={AHORRO_CURRENCY}
                     />
                 </SimpleGrid>
             </Stack>
@@ -108,31 +118,33 @@ export const AhorroSueldoUI = ({ investments }: { investments: Investment[] }) =
 
     return (
         <>
-
-            {/* resumen global (solo si hay más de 1) */}
             {ahorroSueldo.length > 1 && (
                 <SimpleGrid cols={{ base: 1, xs: 3 }} spacing="xs">
                     <CardNumber
                         title="Ahorrado"
                         value={totales.ahorrado}
-                        currency="UYU"
+                        currency={AHORRO_CURRENCY}
                     />
                     <CardNumber
                         title="Ganancia"
                         value={totales.ganancia}
-                        currency="UYU" />
+                        currency={AHORRO_CURRENCY}
+                    />
                     <CardNumber
                         title="Total"
                         value={totales.total}
-                        currency="UYU"
+                        currency={AHORRO_CURRENCY}
                     />
                 </SimpleGrid>
             )}
             <Stack gap="lg">
+
+                Simular?
+                Info?
+
                 <Text size="sm" c="dimmed">
                     {ahorroSueldo.length} inversión{ahorroSueldo.length !== 1 ? "es" : ""} activa{ahorroSueldo.length !== 1 ? "s" : ""}
                 </Text>
-
                 {ahorroSueldo.length === 0 ? (
                     <DashboardCard>
                         <Text ta="center" c="dimmed" size="sm">

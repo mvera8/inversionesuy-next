@@ -6,10 +6,12 @@ import { useRouter } from "next/navigation";
 import { InvestmentForm } from "./InvestmentForm";
 import { Investment } from "@/types/investment";
 import { deleteInvestment } from "@/lib/actions/investments";
-import { IconEdit, IconTrash } from "@tabler/icons-react";
+import { IconEdit, IconInfoCircle, IconTrash } from "@tabler/icons-react";
+import { DashboardCard } from "./DashboardCard";
 
 export interface InvestmentColumn {
     label: string;
+    description?: string;
     render: (investment: Investment) => React.ReactNode;
 }
 
@@ -84,14 +86,29 @@ export function TableInvestments({ dataInvestments, columns }: TableInvestmentsP
     ));
 
     return (
-        <>
+        <DashboardCard>
             <Table highlightOnHover verticalSpacing="xs">
                 <Table.Thead>
                     <Table.Tr>
                         {columns.map((col, i) => (
-                            <Table.Th key={i}>{col.label}</Table.Th>
+                            <Table.Th key={i}>
+                                {col.description ? (
+                                    <Tooltip
+                                        withArrow
+                                        label={col.description}>
+                                        <Group gap={5}>
+                                            {col.label}
+                                            <ActionIcon variant="subtle" color="gray" size="xs">
+                                                <IconInfoCircle size={16} />
+                                            </ActionIcon>
+                                        </Group>
+                                    </Tooltip>
+                                ) : (
+                                    col.label
+                                )}
+                            </Table.Th>
                         ))}
-                        <Table.Th>Acciones</Table.Th>
+                        <Table.Th ta="right">Acciones</Table.Th>
                     </Table.Tr>
                 </Table.Thead>
                 <Table.Tbody>
@@ -144,6 +161,6 @@ export function TableInvestments({ dataInvestments, columns }: TableInvestmentsP
                     </Button>
                 </Group>
             </Modal>
-        </>
+        </DashboardCard>
     );
 }

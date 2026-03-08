@@ -1,11 +1,13 @@
 
 import { Button, Container, Text } from '@mantine/core'
 import tools from '@/data/tools'
+import { Navbar } from '@/components/Navbar'
 
 export default async function Page() {
 
   return (
     <>
+      <Navbar />
       <Container>
         <Text size="xl">Home</Text>
 
