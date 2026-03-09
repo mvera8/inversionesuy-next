@@ -6,6 +6,7 @@ export interface FAQ {
 export interface Tool {
     value: string;
     label: string;
+    description?: string;
     color: string;
     riesgo: string;
     faqs?: FAQ[];
@@ -15,6 +16,7 @@ const tools: Tool[] = [
     {
         "value": "plazo_fijo",
         "label": "Plazo Fijo",
+        "description": "Instrumento de renta fija que ofrece una tasa de interés predeterminada por un período fijo. Ideal para inversores conservadores que buscan estabilidad y previsibilidad.",
         "color": "blue",
         "riesgo": "Bajo",
         "faqs": [
@@ -64,7 +66,7 @@ const tools: Tool[] = [
         "value": "crypto",
         "label": "Crypto",
         "riesgo": "Medio",
-        "color": "orange"
+        "color": "cyan"
     },
     {
         "value": "acciones",
@@ -79,10 +81,10 @@ const tools: Tool[] = [
         "color": "teal"
     },
     {
-        "value": "otro",
+        "value": "other",
         "label": "Otro",
         "riesgo": "-",
-        "color": "gray"
+        "color": "orange"
     }
 ];
 

@@ -14,6 +14,14 @@ export function getInvestmentResult(investment: Investment): InvestmentResult {
     const expirationDate = dayjs(investment.expiration_date);
     const dias = expirationDate.diff(purchaseDate, 'day');
 
+    if (investment.type === 'other') {
+        return {
+            invested: Number(investment.amount_nominal),
+            gain: 0,
+            total: Number(investment.amount_nominal),
+        };
+    }
+
     if (investment.type === 'ahorro_sueldo') {
         const calc = calculateAhorroSueldo({
             montoMensual: Number(investment.amount_nominal),

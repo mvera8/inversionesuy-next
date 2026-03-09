@@ -1,10 +1,10 @@
 'use client';
 
 import { useState, useMemo } from "react";
-import { Button, Text, SimpleGrid, Group, Badge, Card, Stack, NumberFormatter } from "@mantine/core";
+import { Button, Text, SimpleGrid, Group, Badge, Card, Stack, ThemeIcon, SegmentedControl } from "@mantine/core";
 import { Investment } from "@/types/investment";
 import { resolveToolColor, resolveToolName } from "@/utils/tools";
-import { IconPlus } from "@tabler/icons-react";
+import { IconPlus, IconPointFilled } from "@tabler/icons-react";
 import { CurrencySwitcher } from "@/components/CurrencySwitcher";
 import { CardNumber } from "@/components/CardNumber";
 import { InvestmentColumn, TableInvestments } from "@/components/TableInvestments";
@@ -13,84 +13,126 @@ import { ShellNavbar } from "@/components/ShellNavbar";
 import { ShellMain } from "@/components/ShellMain";
 import { DashboardCard } from "@/components/DashboardCard";
 import { DashboardTitle } from "@/components/DashboardTitle";
-import dayjs from "dayjs";
 import { useCurrency } from "@/context/currency";
 import { InvestorProfile } from "@/components/InvestorProfile";
 import { getInvestmentResult } from "@/utils/investment";
 import { resolveInstitutionName } from "@/utils/banks";
 import { CurrencyFormatter } from "@/components/CurrencyFormatter";
+import { convertAmount } from "@/utils/currency";
+import dayjs from "dayjs";
 
 interface DashboardClientProps {
     user: any;
     investments: Investment[] | null;
 }
 
-const columns: InvestmentColumn[] = [
-    { label: "Inversión", render: inv => <Text fw={500}>{inv.name}</Text> },
-    { label: "Tipo", render: inv => <Badge color={resolveToolColor(inv.type)} variant="light">{resolveToolName(inv.type)}</Badge> },
-    { label: "Institución", render: inv => resolveInstitutionName(inv.institution) },
-    { label: "Moneda", render: inv => inv.currency },
-    { label: "Invertido", render: inv => <CurrencyFormatter value={getInvestmentResult(inv).invested} currency={inv.currency} /> },
-    { label: "Ganancia", render: inv => <Text c="green"><CurrencyFormatter value={getInvestmentResult(inv).gain} currency={inv.currency} /></Text> },
-];
+type StatusFilter = 'ALL' | 'active' | 'expired';
 
 export function DashboardUI({ user, investments }: DashboardClientProps) {
-    const currency = useCurrency();
+    const { currency, usdRate, uiRate } = useCurrency();
     const metadata = user.user_metadata;
+
     const [filterType, setFilterType] = useState<string | 'ALL'>('ALL');
+    const [filterMoneda, setFilterMoneda] = useState<string>('ALL');
+    const [filterStatus, setFilterStatus] = useState<StatusFilter>('ALL');
 
     const types = useMemo(() => {
         if (!investments) return [];
         return Array.from(new Set(investments.map(inv => inv.type))).filter(Boolean);
     }, [investments]);
 
+    // Monedas disponibles en las inversiones
+    const monedas = useMemo(() => {
+        if (!investments) return [];
+        return Array.from(new Set(investments.map(inv => String(inv.currency).toUpperCase()))).filter(Boolean);
+    }, [investments]);
+
     const nextPayments = useMemo(() => {
         if (!investments) return [];
         return investments
-            .filter(inv => inv.expiration_date)
-            .sort((a, b) =>
-                new Date(a.expiration_date!).getTime() - new Date(b.expiration_date!).getTime()
-            );
+            .filter(inv => inv.expiration_date && dayjs(inv.expiration_date).isAfter(dayjs()))
+            .sort((a, b) => new Date(a.expiration_date!).getTime() - new Date(b.expiration_date!).getTime())
+            .slice(0, 4);
     }, [investments]);
 
     const filteredInvestments = useMemo(() => {
         if (!investments) return [];
-        if (filterType === 'ALL') return investments;
-        return investments.filter(inv => inv.type === filterType);
-    }, [investments, filterType]);
+        return investments.filter(inv => {
+            if (filterType !== 'ALL' && inv.type !== filterType) return false;
+            if (filterMoneda !== 'ALL' && String(inv.currency).toUpperCase() !== filterMoneda) return false;
+            if (filterStatus === 'active') {
+                if (inv.expiration_date && dayjs(inv.expiration_date).isBefore(dayjs())) return false;
+            }
+            if (filterStatus === 'expired') {
+                if (!inv.expiration_date || dayjs(inv.expiration_date).isAfter(dayjs())) return false;
+            }
+            return true;
+        });
+    }, [investments, filterType, filterMoneda, filterStatus]);
 
     const totalInvestments = useMemo(() => {
-        return filteredInvestments.reduce((acc, inv) => {
-            return acc + getInvestmentResult(inv).invested;
-        }, 0);
-    }, [filteredInvestments]);
+        return filteredInvestments
+            .filter(inv => !inv.expiration_date || dayjs(inv.expiration_date).isAfter(dayjs()))
+            .reduce((acc, inv) => {
+                const { invested } = getInvestmentResult(inv);
+                return acc + convertAmount(invested, inv.currency, currency, usdRate);
+            }, 0);
+    }, [filteredInvestments, currency, usdRate]);
 
     const totalGains = useMemo(() => {
-        return filteredInvestments.reduce((acc, inv) => {
-            return acc + getInvestmentResult(inv).gain;
-        }, 0);
-    }, [filteredInvestments]);
+        return filteredInvestments
+            .filter(inv => !inv.expiration_date || dayjs(inv.expiration_date).isAfter(dayjs()))
+            .reduce((acc, inv) => {
+                const { gain } = getInvestmentResult(inv);
+                return acc + convertAmount(gain, inv.currency, currency, usdRate);
+            }, 0);
+    }, [filteredInvestments, currency, usdRate]);
+
+    const columns: InvestmentColumn[] = [
+        {
+            label: "Nombre", render: inv => {
+                const vencido = dayjs(inv.expiration_date).isBefore(dayjs());
+                return (
+                    <Group>
+                        <ThemeIcon variant="light" radius="xl" color={vencido ? "red" : "lime"}>
+                            <IconPointFilled style={{ width: '70%', height: '70%' }} />
+                        </ThemeIcon>
+                        <Text fw={500} c={vencido ? "dimmed" : "dark"}>{inv.name}</Text>
+                    </Group>
+                );
+            }
+        },
+        {
+            label: "Tipo",
+            render: inv => <Badge color={resolveToolColor(inv.type)} variant="light">
+                {resolveToolName(inv.type)}
+            </Badge>
+        },
+        { label: "Institución", render: inv => resolveInstitutionName(inv.institution) },
+        {
+            label: "Monto",
+            description: "Monto invertido o Monto por mes.",
+            render: inv => <CurrencyFormatter value={convertAmount(inv.amount_nominal, inv.currency, inv.currency === 'UI' ? 'UYU' : inv.currency, usdRate, uiRate)} currency={inv.currency} />
+        },
+        { label: "Invertido", render: inv => <CurrencyFormatter value={convertAmount(getInvestmentResult(inv).invested, inv.currency, currency, usdRate, uiRate)} currency={currency} /> },
+        { label: "Ganancia", render: inv => <Text c="green"><CurrencyFormatter value={convertAmount(getInvestmentResult(inv).gain, inv.currency, currency, usdRate, uiRate)} currency={currency} /></Text> },
+    ];
 
     return (
         <>
             <ShellNavbar>
                 <CurrencySwitcher />
-                <Text size="xs" c="dimmed" fw={700} tt="uppercase">
-                    menu
-                </Text>
+                <Text size="xs" c="dimmed" fw={700} tt="uppercase">menu</Text>
                 <DashboardButton
                     label="Agregar inversión"
                     link="/add-investment"
                     justify="center"
                     size="lg"
                     icon={<IconPlus />}
-
                 />
                 {types.length > 0 && (
                     <>
-                        <Text size="xs" c="dimmed" fw={700} tt="uppercase">
-                            Inversiones
-                        </Text>
+                        <Text size="xs" c="dimmed" fw={700} tt="uppercase">Inversiones</Text>
                         {types.map(type => (
                             <DashboardButton
                                 key={type}
@@ -111,24 +153,15 @@ export function DashboardUI({ user, investments }: DashboardClientProps) {
                 />
 
                 <SimpleGrid cols={2} mb="md">
-                    <CardNumber
-                        title="Monto invertido:"
-                        value={totalInvestments}
-                        currency={currency.currency}
-                    />
-                    <CardNumber
-                        title="Ganancia estimada:"
-                        value={totalGains}
-                        currency={currency.currency}
-                    />
+                    <CardNumber title="Monto invertido:" value={totalInvestments} currency={currency} />
+                    <CardNumber title="Ganancia estimada:" value={totalGains} currency={currency} />
                 </SimpleGrid>
 
-                <Group gap="xs">
+                {/* Filtros */}
+                <Group gap="xs" mb="xs" wrap="wrap">
+                    {/* Por tipo */}
                     <Button
-                        radius="xl"
-                        variant="transparent"
-                        px="xs"
-                        size="sm"
+                        radius="xl" variant="transparent" px="xs" size="sm"
                         color={filterType === 'ALL' ? "gray.9" : "gray.4"}
                         onClick={() => setFilterType('ALL')}
                     >
@@ -140,10 +173,7 @@ export function DashboardUI({ user, investments }: DashboardClientProps) {
                     {types.map(type => (
                         <Button
                             key={type}
-                            radius="xl"
-                            variant="transparent"
-                            px="xs"
-                            size="sm"
+                            radius="xl" variant="transparent" px="xs" size="sm"
                             color={filterType === type ? "gray.9" : "gray.4"}
                             onClick={() => setFilterType(type)}
                         >
@@ -152,12 +182,32 @@ export function DashboardUI({ user, investments }: DashboardClientProps) {
                     ))}
                 </Group>
 
-                <DashboardCard>
-                    <TableInvestments
-                        dataInvestments={filteredInvestments}
-                        columns={columns}
+                <Group gap="sm" mb="md" wrap="wrap">
+                    {/* Por moneda */}
+                    <SegmentedControl
+                        size="xs"
+                        value={filterMoneda}
+                        onChange={setFilterMoneda}
+                        data={[
+                            { label: 'Todas', value: 'ALL' },
+                            ...monedas.map(m => ({ label: m, value: m })),
+                        ]}
                     />
-                </DashboardCard>
+
+                    {/* Por estado */}
+                    <SegmentedControl
+                        size="xs"
+                        value={filterStatus}
+                        onChange={(v) => setFilterStatus(v as StatusFilter)}
+                        data={[
+                            { label: 'Todos', value: 'ALL' },
+                            { label: 'Activas', value: 'active' },
+                            { label: 'Vencidas', value: 'expired' },
+                        ]}
+                    />
+                </Group>
+
+                <TableInvestments dataInvestments={filteredInvestments} columns={columns} />
 
                 <SimpleGrid cols={3}>
                     <DashboardCard title="Perfil Inversor">
@@ -173,18 +223,14 @@ export function DashboardUI({ user, investments }: DashboardClientProps) {
                                         <Group justify="space-between">
                                             <Stack gap={0}>
                                                 <Text fw={500}>{inv.name}</Text>
-                                                <Text c={daysLeft <= 0 ? "red" : daysLeft <= 7 ? "orange" : "green"}>
-                                                    {daysLeft <= 0 ? "Vencido" : `${daysLeft} días restantes`}
+                                                <Text size="sm" c={daysLeft <= 7 ? "orange" : "green"}>
+                                                    {daysLeft} días restantes
                                                 </Text>
                                             </Stack>
-                                            <Badge
-                                                color={resolveToolColor(inv.type)}
-                                                variant="light"
-                                            >
+                                            <Badge color={resolveToolColor(inv.type)} variant="light">
                                                 {resolveToolName(inv.type)}
                                             </Badge>
                                         </Group>
-
                                     </Card>
                                 );
                             })
@@ -199,7 +245,7 @@ export function DashboardUI({ user, investments }: DashboardClientProps) {
                         <Text>Mejores Inversiones (Letras, Bonos, acciones)</Text>
                     </DashboardCard>
                 </SimpleGrid>
-            </ShellMain >
+            </ShellMain>
         </>
     );
 }

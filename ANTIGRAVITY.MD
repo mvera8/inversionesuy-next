@@ -49,9 +49,8 @@ No se hacen pagos en la plataforma, es solo un tracker de inversiones.
 
 Esta tabla centraliza los valores del mercado para simulaciones y reportes.
 
-- `key`: text (PK - Ej: 'USD_BUY', 'USD_SELL', 'UI_VALUE', 'UP_VALUE')
+- `key`: text (PK - Ej: 'USD', 'UI')
 - `value`: numeric
-- `last_update`: timestamp with time zone
 
 ## Lógica de Negocio (Uruguay)
 
@@ -62,3 +61,4 @@ Esta tabla centraliza los valores del mercado para simulaciones y reportes.
 ## No Negociables
 
 - Siempre pensa en la Performance y rendimiento del sitio y querys.
+- No cometa errores de seguridad.

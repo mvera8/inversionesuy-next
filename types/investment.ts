@@ -2,7 +2,7 @@ export interface Investment {
     id: string;
     user_id: string;
     name: string;
-    type: 'letra' | 'plazo_fijo' | 'crypto' | 'bono' | 'ahorro_sueldo';
+    type: 'letra' | 'plazo_fijo' | 'crypto' | 'bono' | 'ahorro_sueldo' | 'other';
     subtype?: string;
     currency: 'UYU' | 'USD' | 'UI';
     amount_nominal: number;

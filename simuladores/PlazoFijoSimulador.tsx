@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from "react";
-import { NumberInput, NumberFormatter, Text, Title, Group, SimpleGrid, Select, Button } from "@mantine/core";
+import { NumberInput, NumberFormatter, Text, Title, Group, SimpleGrid, Select, Button, Stack, SegmentedControl } from "@mantine/core";
 import { calculatePlazoFijo } from "@/utils/plazoFijo-calculator";
 import { DashboardCard } from "@/components/DashboardCard";
 import { IconInfoCircle } from "@tabler/icons-react";
@@ -105,71 +105,66 @@ export const PlazoFijoSimulator = () => {
     return (
         <SimpleGrid cols={2}>
             <DashboardCard>
-                <Group justify="space-between" align="center" mb="md">
-                    <Title order={4}>Simulador Plazo Fijo</Title>
-                    <Select
+                <Stack>
+                    <SegmentedControl
+                        data={CURRENCY_OPTIONS}
                         value={currency}
                         onChange={(val) => setCurrency((val as CurrencyView) ?? 'pesos')}
-                        data={CURRENCY_OPTIONS}
-                        size="xs"
-                        w={180}
                     />
-                </Group>
 
-                <Select
-                    label="Banco"
-                    placeholder="Buscar Bancos"
-                    value={entidad}
-                    onChange={setEntidad}
-                    mb="xs"
-                    searchable
-                    data={bancosDisponibles.map(b => ({
-                        label: b.label,
-                        value: b.id,
-                    }))}
-                />
+                    <Select
+                        label="Banco"
+                        placeholder="Buscar Bancos"
+                        value={entidad}
+                        onChange={setEntidad}
+                        searchable
+                        data={bancosDisponibles.map(b => ({
+                            label: b.label,
+                            value: b.id,
+                        }))}
+                    />
 
-                {disclaimer && (
-                    <Group gap={4} mb="xs">
-                        <IconInfoCircle size={14} />
-                        <Text size="xs" c="dimmed">{disclaimer}</Text>
-                    </Group>
-                )}
+                    {disclaimer && (
+                        <Group gap={4}>
+                            <IconInfoCircle size={14} />
+                            <Text size="xs" c="dimmed">{disclaimer}</Text>
+                        </Group>
+                    )}
 
-                <NumberInput
-                    label="Monto a invertir"
-                    description={minimo ? `Mínimo: ${symbol} ${minimo}` : undefined}
-                    value={montoInvertir}
-                    onChange={(val) => setMontoInvertir(Number(val))}
-                    mb="sm"
-                    min={0}
-                />
+                    <NumberInput
+                        label="Monto a invertir"
+                        description={minimo ? `Mínimo: ${symbol} ${minimo}` : undefined}
+                        value={montoInvertir}
+                        onChange={(val) => setMontoInvertir(Number(val))}
+                        min={0}
+                    />
 
-                <Select
-                    label="Tipo de Plazo Fijo"
-                    value={plazoTipo}
-                    onChange={setPlazoTipo}
-                    disabled={!tiposDisponibles.length}
-                    mb="sm"
-                    data={tiposDisponibles.map(tipo => ({
-                        value: tipo,
-                        label: tipo === "vencimiento" ? "Al vencimiento" : "Mensual",
-                    }))}
-                />
+                    <Select
+                        label="Tipo de Plazo Fijo"
+                        value={plazoTipo}
+                        onChange={setPlazoTipo}
+                        disabled={!tiposDisponibles.length}
+                        data={tiposDisponibles.map(tipo => ({
+                            value: tipo,
+                            label: tipo === "vencimiento" ? "Al vencimiento" : "Mensual",
+                        }))}
+                    />
 
-                <NumberInput
-                    label="Días de Inversión"
-                    value={periodo}
-                    onChange={setPeriodo}
-                    disabled={!tiposDisponibles.length}
-                    min={1}
-                    max={366}
-                    mb="sm"
-                />
+                    <NumberInput
+                        label="Días de Inversión"
+                        value={periodo}
+                        onChange={setPeriodo}
+                        disabled={!tiposDisponibles.length}
+                        min={1}
+                        max={366}
+                    />
 
-                <Text size="xs" c="dimmed">
-                    El interés se calcula según los días exactos ingresados. Algunos bancos agrupan plazos en rangos (ej: 270-366 días con la misma tasa).
-                </Text>
+                    <Text size="xs" c="dimmed">
+                        El interés se calcula según los días exactos ingresados. Algunos bancos agrupan plazos en rangos (ej: 270-366 días con la misma tasa).
+                    </Text>
+                </Stack>
+
+
             </DashboardCard>
 
             <DashboardCard>

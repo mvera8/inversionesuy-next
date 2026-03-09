@@ -1,7 +1,8 @@
+// ui/InvestmentTypeUI.tsx
 'use client';
 
 import { CurrencySwitcher } from "@/components/CurrencySwitcher";
-import { resolveToolColor, resolveToolName } from "@/utils/tools";
+import { resolveToolName } from "@/utils/tools";
 import { Investment } from "@/types/investment";
 import { InvestmentTabs } from "@/components/InvestmentTabs";
 import { InvestmentColumn, TableInvestments } from "@/components/TableInvestments";
@@ -10,36 +11,53 @@ import { ShellNavbar } from "@/components/ShellNavbar";
 import { DashboardTitle } from "@/components/DashboardTitle";
 import { DashboardButton } from "@/components/DashboardButton";
 import { AhorroSueldoUI } from "./AhorroSueldoUI";
-import { Badge, NumberFormatter, Text } from "@mantine/core";
+import { NumberFormatter, Text } from "@mantine/core";
 import { resolveInstitutionName } from "@/utils/banks";
-import dayjs from "dayjs";
 import { CurrencyFormatter } from "@/components/CurrencyFormatter";
 import { getInvestmentResult } from "@/utils/investment";
-import { DashboardCard } from "@/components/DashboardCard";
-
+import { useCurrency } from "@/context/currency";
+import { convertAmount } from "@/utils/currency";
+import dayjs from "dayjs";
+import { PlazoFijoSimulator } from "@/simuladores/PlazoFijoSimulador";
+import { ToolInformation } from "./ToolInformation";
 
 interface InvestmentTypeUIProps {
     type: string;
     investments: Investment[];
 }
 
-const columns: InvestmentColumn[] = [
-    { label: "Inversión", render: inv => <Text fw={500}>{inv.name}</Text> },
-    { label: "Tipo", render: inv => <Badge color={resolveToolColor(inv.type)} variant="light">{resolveToolName(inv.type)}</Badge> },
-    { label: "Institución", render: inv => resolveInstitutionName(inv.institution) },
-    { label: "Moneda", render: inv => inv.currency },
-    { label: "Tasa", render: inv => inv.rate ? <NumberFormatter value={Number(inv.rate)} suffix="%" decimalScale={2} /> : '-' },
-    { label: "Fecha Compra", render: inv => dayjs(inv.purchase_date).format('DD/MM/YYYY') },
-    { label: "Fecha Vencimiento", render: inv => inv.expiration_date ? dayjs(inv.expiration_date).format('DD/MM/YYYY') : '-' },
-    { label: "Invertido", render: inv => <CurrencyFormatter value={getInvestmentResult(inv).invested} currency={inv.currency} /> },
-    { label: "Ganancia", render: inv => <Text c="green"><CurrencyFormatter value={getInvestmentResult(inv).gain} currency={inv.currency} /></Text> },
-];
-
 export function InvestmentTypeUI({ type, investments }: InvestmentTypeUIProps) {
+    const { currency, usdRate } = useCurrency();
+    let columns: InvestmentColumn[] = [];
+
+    if (type === 'other') {
+        columns = [
+            { label: "Inversión", render: inv => <Text fw={500}>{inv.name}</Text> },
+            { label: "Institución", render: inv => resolveInstitutionName(inv.institution) },
+            { label: "Moneda", render: inv => inv.currency },
+            { label: "Fecha Compra", render: inv => dayjs(inv.purchase_date).format('DD/MM/YYYY') },
+            { label: "Invertido", render: inv => <CurrencyFormatter value={convertAmount(getInvestmentResult(inv).invested, inv.currency, currency, usdRate)} currency={currency} /> },
+        ];
+    } else {
+        columns = [
+            { label: "Inversión", render: inv => <Text fw={500}>{inv.name}</Text> },
+            { label: "Institución", render: inv => resolveInstitutionName(inv.institution) },
+            { label: "Moneda", render: inv => inv.currency },
+            { label: "Tasa", render: inv => inv.rate ? <NumberFormatter value={Number(inv.rate)} suffix="%" decimalScale={2} /> : '-' },
+            { label: "Fecha Compra", render: inv => dayjs(inv.purchase_date).format('DD/MM/YYYY') },
+            { label: "Fecha Vencimiento", render: inv => inv.expiration_date ? dayjs(inv.expiration_date).format('DD/MM/YYYY') : '-' },
+            { label: "Invertido", render: inv => <CurrencyFormatter value={convertAmount(getInvestmentResult(inv).invested, inv.currency, currency, usdRate)} currency={currency} /> },
+            { label: "Ganancia", render: inv => <Text c="green"><CurrencyFormatter value={convertAmount(getInvestmentResult(inv).gain, inv.currency, currency, usdRate)} currency={currency} /></Text> },
+        ];
+    }
+
     return (
         <>
             <ShellNavbar>
-                <CurrencySwitcher />
+                {type !== 'ahorro_sueldo' && (
+                    <CurrencySwitcher />
+                )}
+
                 <DashboardButton
                     label="Dashboard"
                     link="/dashboard"
@@ -50,20 +68,22 @@ export function InvestmentTypeUI({ type, investments }: InvestmentTypeUIProps) {
                 <DashboardTitle
                     title={resolveToolName(type)}
                 />
-
-                <DashboardCard>
-                    {type === 'ahorro_sueldo' ? (
-                        <AhorroSueldoUI
-                            investments={investments}
-                        />
-                    ) : (
-                        <InvestmentTabs
-                            investmentsContent={<TableInvestments dataInvestments={investments} columns={columns} />}
-                        />
-                    )}
-                </DashboardCard>
-
-
+                {type === 'ahorro_sueldo' ? (
+                    <AhorroSueldoUI
+                        investments={investments}
+                    />
+                ) : type === 'plazo_fijo' ? (
+                    <InvestmentTabs
+                        investmentsContent={<TableInvestments dataInvestments={investments} columns={columns} />}
+                        simulateContent={<PlazoFijoSimulator />}
+                        informationContent={<ToolInformation type={type} />}
+                    />
+                ) : (
+                    <TableInvestments
+                        dataInvestments={investments}
+                        columns={columns}
+                    />
+                )}
             </ShellMain>
         </>
     );

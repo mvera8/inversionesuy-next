@@ -7,18 +7,20 @@ export type Currency = 'UYU' | 'USD';
 interface CurrencyContextType {
     currency: Currency;
     setCurrency: (currency: Currency) => void;
+    usdRate: number;
+    uiRate: number;
 }
 
 const DEFAULT_CURRENCY: Currency = 'UYU';
 
 const CurrencyContext = createContext<CurrencyContextType | undefined>(undefined);
 
-export function CurrencyProvider({ children }: { children: ReactNode }) {
+export function CurrencyProvider({ children, usdRate, uiRate }: { children: ReactNode; usdRate: number, uiRate: number }) {
     const [currency, setCurrencyState] = useState<Currency>(DEFAULT_CURRENCY);
 
     useEffect(() => {
         const savedCurrency = localStorage.getItem('app-currency') as Currency;
-        if (savedCurrency && ['UYU', 'USD'].includes(savedCurrency)) {
+        if (savedCurrency && ['UYU', 'USD', 'UI'].includes(savedCurrency)) {
             setCurrencyState(savedCurrency);
         }
     }, []);
@@ -29,7 +31,7 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
     };
 
     return (
-        <CurrencyContext.Provider value={{ currency, setCurrency }}>
+        <CurrencyContext.Provider value={{ currency, setCurrency, usdRate, uiRate }}>
             {children}
         </CurrencyContext.Provider>
     );
